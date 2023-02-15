@@ -7,7 +7,7 @@ import News
 # telegram
 import logging
 # from telegram import __version__ as TG_VER
-from telegram import ForceReply, Update
+from telegram import  Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 baseUrl = "https://vnexpress.net/"  
 TOKEN = '6018262692:AAFZU5Pm05WeNlO5xRhhO15-yujLnLYaxmg'
