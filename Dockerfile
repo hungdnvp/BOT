@@ -18,4 +18,4 @@ ENV BOT_TOKEN=''
 WORKDIR /app
 
 # Chạy bot
-CMD ["python3", "vnexpressBOT.py"]
+CMD ["python3", "stupidBOT.py"]
