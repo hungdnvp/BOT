@@ -41,7 +41,7 @@ output = []
 # Định nghĩa đối tượng timezone cho múi giờ ICT (GMT+7)
 ict_tz = pytz.timezone('Asia/Ho_Chi_Minh')
 defaults = Defaults(tzinfo=ict_tz)
-DAILY_TIME = datetime.time(hour=15, minute=44, second=0,tzinfo=ict_tz)
+DAILY_TIME = datetime.time(hour=21, minute=0, second=0,tzinfo=ict_tz)
 #################### handle #################
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends explanation on how to use the bot."""
