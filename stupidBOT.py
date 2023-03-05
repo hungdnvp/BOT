@@ -34,12 +34,14 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
-QUEUE_DATA = ['duy','quang hùng','quang huy','quang sang']
+QUEUE_DATA = ['Huy','QHùng','QSang','Ngân','TTùng','K.Tùng','Thảo','Long','H.Hùng','Mạnh','Uyên','Tú','Phương','Mạnh','Tài','Trung']
 INDEX = -1
+LENGTH = len(QUEUE_DATA)
+output = []
 # Định nghĩa đối tượng timezone cho múi giờ ICT (GMT+7)
 ict_tz = pytz.timezone('Asia/Ho_Chi_Minh')
 defaults = Defaults(tzinfo=ict_tz)
-DAILY_TIME = datetime.time(hour=22, minute=0, second=0,tzinfo=ict_tz)
+DAILY_TIME = datetime.time(hour=15, minute=44, second=0,tzinfo=ict_tz)
 #################### handle #################
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends explanation on how to use the bot."""
@@ -49,7 +51,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
   await update.message.reply_text("Bạn muốn tôi giúp gì? \n \
   1. Đọc báo -> /news <số lượng>\n \
   2. thời gian -> time?\n \
-  3. ok -> ok, hi")
+  3. ok -> ok, hi \n \
+  4. đổi quet vs ->> /next <name of list>")
 
 
 async def news_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -78,12 +81,14 @@ def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     global INDEX
+    global output
+    output.clear()
     job = context.job
-    output = []
-    for i in range(2):
+    for i in range(7):
+        INDEX = (INDEX +1) % (LENGTH)
         output.append(job.data[INDEX])
-        INDEX = (INDEX +2) % (len(job.data))
     await context.bot.send_message(job.chat_id, text=f"Quét vệ sinh!\n {[i for i in output]}")
+
 
 def remove_job_if_exists(name: str, context: ContextTypes.DEFAULT_TYPE) -> bool:
     """Remove job with given name. Returns whether job was removed."""
@@ -111,6 +116,24 @@ async def set_timer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     except (IndexError, ValueError):
         await update.effective_message.reply_text("Usage: /set <seconds>")  
 
+async def next_tern(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global INDEX
+    """next tern a obj in  queue."""
+    chat_id = update.effective_message.chat_id
+    try:
+        next_obj = str(context.args[0]) # Lấy tham số từ input truyền vào -> cào về bao nhiêu tin
+        if next_obj in output and next_obj:
+          temp = QUEUE_DATA.index(next_obj)  # index 
+          new_obj_index = (INDEX +1) % (LENGTH)
+          QUEUE_DATA[temp], QUEUE_DATA[new_obj_index] = QUEUE_DATA[new_obj_index],QUEUE_DATA[new_obj_index]      #swap
+          output[output.index(next_obj)] = QUEUE_DATA[new_obj_index]
+          await context.bot.send_message(chat_id, text=f"Quét vệ sinh!\n {[i for i in output]}")
+        else:
+          await context.bot.send_message(chat_id, text=f"invalid name (dcm) !!")
+           
+    except (IndexError, ValueError):
+      await update.message.reply_text('chọn sai tên (dcm) !!')    
+
 async def unset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
@@ -133,6 +156,8 @@ def main() -> None:
     ## set timmer
     application.add_handler(CommandHandler("set", set_timer))
     application.add_handler(CommandHandler("unset", unset))
+    application.add_handler(CommandHandler("next", next_tern))
+
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
 
